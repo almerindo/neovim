@@ -19,7 +19,11 @@ call plug#begin(stdpath('data') . '/plugged')
 
   " Git
   Plug 'airblade/vim-gitgutter'
-" Initialize plugin system.
+
+  " Terminal toggle buffer
+  Plug 'akinsho/toggleterm.nvim', {'tag' : '*'}
+
+  " Initialize plugin system.
 call plug#end()
 
 " Initial Options
@@ -68,26 +72,6 @@ endi
 let &t_ZH="\e[3m"
 let &t_ZR="\e[23m"
 
-" File browser
-let g:netrw_banner=1
-let g:netrw_liststyle=3
-let g:netrw_browse_split=4
-let g:netrw_altv=1
-let g:netrw_winsize=15
-let g:netrw_keepdir=0
-let g:netrw_localcopydircmd='cp -r'
-
-" Create file without opening buffer
-function! CreateInPreview()
-  let l:filename = input('please enter filename: ')
-  execute 'silent !touch ' . b:netrw_curdir.'/'.l:filename
-  redraw!
-endfunction
-
-" Netrw: create file using touch instead of opening a buffer
-function! Netrw_mappings()
-  noremap <buffer>% :call CreateInPreview()<cr>
-endfunction
 
 augroup auto_commands
 	autocmd filetype netrw call Netrw_mappings()
@@ -103,7 +87,34 @@ autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTr
 " If another buffer tries to replace NERDTree, put it in the other window, and bring back NERDTree.
 autocmd BufEnter * if bufname('#') =~ 'NERD_tree_\d\+' && bufname('%') !~ 'NERD_tree_\d\+' && winnr('$') > 1 |
     \ let buf=bufnr() | buffer# | execute "normal! \<C-W>w" | execute 'buffer'.buf | endif
-nnoremap <C-n> :NERDTreeMirror<CR>:NERDTreeFocus<CR>
 
 let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
+
+
+lua require("toggleterm").setup()
+
+
+augroup auto_commands
+	autocmd BufWrite *.py call CocAction('format')
+augroup END
+
+"" Shortcuts
+let mapleader = "\<Space>"
+
+" Close
+nnoremap <Leader>q :q!<CR>
+
+" File Bar
+nnoremap <Leader>n :NERDTreeMirror<CR>:NERDTreeToggle<CR>
+
+" Tab Navigator Handler
+nnoremap <S-Tab> gT
+nnoremap <Tab> gt
+nnoremap <silent> <S-t> :tabnew<CR>
+
+" Terminal Buffer Handler
+nnoremap <Leader>t :ToggleTerm direction=horizontal<CR>
+nnoremap <Leader>tv :ToggleTerm direction=vertical size=40<CR>
+nnoremap <Leader>ts :TermSelect <CR>
+nnoremap <Leader>ta :ToggleTermToggleAll<CR>
 
