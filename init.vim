@@ -3,6 +3,9 @@ call plug#begin(stdpath('data') . '/plugged')
 
   " Appearance
   Plug 'vim-airline/vim-airline'
+  Plug 'vim-airline/vim-airline-themes'
+  Plug 'doums/darcula'
+
   Plug 'ryanoasis/vim-devicons'
   Plug 'martinsione/darkplus.nvim'
 
@@ -11,10 +14,10 @@ call plug#begin(stdpath('data') . '/plugged')
   Plug 'jiangmiao/auto-pairs'
   Plug 'ap/vim-css-color'
   Plug 'preservim/nerdtree'
-  Plug 'kien/ctrlp.vim'
+  Plug 'ctrlpvim/ctrlp.vim'
 
   " Completion / linters / formatters
-  Plug 'neoclide/coc.nvim',  {'branch': 'master', 'do': 'yarn install'}
+  Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install'}
   Plug 'plasticboy/vim-markdown'
 
   " Git
@@ -40,8 +43,10 @@ set splitbelow splitright
 set title
 set ttimeoutlen=0
 set wildmenu
-colorscheme darkplus
+colorscheme darcula
 set background=dark
+set termguicolors
+
 
 
 " Tabs size
@@ -77,9 +82,35 @@ augroup auto_commands
 	autocmd filetype netrw call Netrw_mappings()
 augroup END
 
-let g:airline_theme='darkplus'
+let g:airline_theme='molokai'
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
+" FileBrowsers
+" File browser
+
+let g:netrw_banner=0
+let g:netrw_liststyle=3
+let g:netrw_browse_split=4
+let g:netrw_altv=1
+let g:netrw_winsize=15
+let g:netrw_keepdir=0
+let g:netrw_localcopydircmd='cp -r'
+
+" Create file without opening buffer
+function! CreateInPreview()
+  let l:filename = input('please enter filename: ')
+  execute 'silent !touch ' . b:netrw_curdir.'/'.l:filename
+  redraw!
+endfunction
+
+" Netrw: create file using touch instead of opening a buffer
+function! Netrw_mappings()
+  noremap <buffer>% :call CreateInPreview()<cr>
+endfunction
+
+augroup auto_commands
+	autocmd filetype netrw call Netrw_mappings()
+augroup END
 
 " NERTTRee
 let NERDTreeShowHidden=1
@@ -97,6 +128,8 @@ lua require("toggleterm").setup()
 augroup auto_commands
 	autocmd BufWrite *.py call CocAction('format')
 augroup END
+
+let g:coc_global_config="$HOME/.config/nvim/coc-settings.json"
 
 "" Shortcuts
 let mapleader = "\<Space>"
